@@ -9,8 +9,15 @@
       Tech = videojs.getTech('Tech'),
       Html5 = videojs.getComponent('Html5');
 
-  var Hlsjs = videojs.extend(Html5, {
-    initHls_: function() {
+
+  class Hlsjs extends Html5 {
+
+    constructor(player, options) {
+      super(player, options);
+      this.initHls_();
+    }
+
+    initHls_()  {
       this.options_.hls.autoStartLoad = false;
       this.hls_ = new Hls(this.options_.hls);
 
@@ -33,9 +40,9 @@
       this.levels_ = [];
 
       this.hls_.attachMedia(this.el_);
-    },
+    }
 
-    bindExternalCallbacks_: function() {
+    bindExternalCallbacks_() {
       var resolveCallbackFromOptions = function(evt, options, hls) {
         var capitalize = function(str) {
           return str.charAt(0).toUpperCase() + str.slice(1);
@@ -60,13 +67,13 @@
           }
         }
       }
-    },
+    }
 
-    onMediaAttached_: function() {
+    onMediaAttached_() {
       this.triggerReady();
-    },
+    }
 
-    updateTimeRange_: function() {
+    updateTimeRange_() {
       var range;
 
       if (this.hls_ && this.hls_.currentLevel >= 0) {
@@ -97,9 +104,9 @@
       }
 
       this.timeRange_ = range;
-    },
+    }
 
-    play: function() {
+    play() {
       if (this.preload() === 'none' && !this.hasStarted_) {
         if (this.setLevelOnLoad_) {
           this.setLevel(this.setLevelOnLoad_);
@@ -108,14 +115,14 @@
       }
 
       Html5.prototype.play.apply(this);
-    },
+    }
 
-    duration: function() {
+    duration() {
       this.updateTimeRange_();
       return (this.timeRange_) ? this.timeRange_.end - this.timeRange_.start : undefined;
-    },
+    }
 
-    currentTime: function() {
+    currentTime() {
       this.updateTimeRange_();
       if (this.hls_.currentLevel !== this.lastLevel_) {
         this.trigger('levelswitched');
@@ -123,9 +130,9 @@
 
       this.lastLevel_ = this.hls_.currentLevel;
       return Html5.prototype.currentTime.apply(this);
-    },
+    }
 
-    seekable: function() {
+    seekable() {
       if (this.timeRange_) {
         return {
           start: function() { return this.timeRange_.start; }.bind(this),
@@ -135,9 +142,9 @@
       } else {
         return {length: 0};
       }
-    },
+    }
 
-    onManifestParsed_: function() {
+    onManifestParsed_() {
       var hasAutoLevel = !this.options_.disableAutoLevel, startLevel, autoLevel;
 
       this.parseLevels_();
@@ -179,9 +186,9 @@
       }
 
       this.trigger('levelsloaded');
-    },
+    }
 
-    initAudioTracks_: function() {
+    initAudioTracks_() {
       var i, toRemove = [], vjsTracks = this.audioTracks(),
           hlsTracks = this.hls_.audioTracks,
           hlsGroups = [],
@@ -250,9 +257,9 @@
         vjsTrack.addEventListener('enabledchange', modeChanged.bind(vjsTrack, this));
         vjsTracks.addTrack(vjsTrack);
       }
-    },
+    }
 
-    initTextTracks_: function() {
+    initTextTracks_() {
       var i, toRemove = [], vjsTracks = this.textTracks(),
           hlsTracks = this.hls_.subtitleTracks,
           modeChanged = function() {
@@ -288,9 +295,9 @@
       if (hlsHasDefaultTrack) {
         this.trigger('texttrackchange');
       }
-    },
+    }
 
-    getLevelByHeight_: function (h) {
+    getLevelByHeight_(h) {
       var i, result;
       for (i = 0; i < this.levels_.length; i++) {
         var cLevel = this.levels_[i],
@@ -303,9 +310,9 @@
         }
       }
       return result;
-    },
+    }
 
-    parseLevels_: function() {
+    parseLevels_() {
       this.levels_ = [];
       this.currentLevel_ = undefined;
 
@@ -346,9 +353,9 @@
           this.currentLevel_ = undefined;
         }
       }
-    },
+    }
 
-    setSrc: function(src) {
+    setSrc(src) {
       if (this.hls_) {
         this.hls_.destroy();
       }
@@ -359,9 +366,9 @@
 
       this.initHls_();
       this.hls_.loadSource(src);
-    },
+    }
 
-    onMediaError_: function(event) {
+    onMediaError_(event) {
       var error = event.currentTarget.error;
       if (error && error.code === error.MEDIA_ERR_DECODE) {
         var data = {
@@ -372,9 +379,9 @@
 
         this.onError_(event, data);
       }
-    },
+    }
 
-    onError_: function(event, data) {
+    onError_(event, data) {
       var abort = [Hls.ErrorDetails.MANIFEST_LOAD_ERROR,
                    Hls.ErrorDetails.MANIFEST_LOAD_TIMEOUT,
                    Hls.ErrorDetails.MANIFEST_PARSING_ERROR];
@@ -419,49 +426,49 @@
           }
         }
       }
-    },
+    }
 
-    currentLevel: function() {
+    currentLevel() {
       var hasAutoLevel = !this.options_.disableAutoLevel;
       return (this.currentLevel_ && this.currentLevel_.index === -1) ?
                 this.levels_[(hasAutoLevel) ? this.hls_.currentLevel+1  : this.hls_.currentLevel] :
                 this.currentLevel_;
-    },
+    }
 
-    isAutoLevel: function() {
+    isAutoLevel() {
       return this.currentLevel_ && this.currentLevel_.index === -1;
-    },
+    }
 
-    setLevel: function(level) {
+    setLevel(level) {
       this.currentLevel_ = level;
       this.setLevelOnLoad_ = undefined;
       this.hls_.currentLevel = level.index;
       this.hls_.loadLevel = level.index;
-    },
+    }
 
-    getLevels: function() {
+    getLevels() {
       return this.levels_;
-    },
+    }
 
-    supportsStarttime: function() {
+    supportsStarttime() {
       return true;
-    },
+    }
 
-    starttime: function(starttime) {
+    starttime(starttime) {
       if (starttime) {
         this.starttime_ = starttime;
       } else {
         return this.starttime_;
       }
-    },
+    }
 
-    dispose: function() {
+    dispose() {
       if (this.hls_) {
         this.hls_.destroy();
       }
       return Html5.prototype.dispose.apply(this);
     }
-  });
+  };
 
   Hlsjs.isSupported = function() {
     return Hls.isSupported();
