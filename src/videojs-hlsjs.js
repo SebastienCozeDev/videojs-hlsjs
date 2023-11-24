@@ -71,41 +71,42 @@ document.getElementById('src').addEventListener('change', function() { document.
 
 
 // ----- STARTING PLUGIN ----- //
-
-console.log("Lecture fichier plugin");
-console.log(Hls);
+console.log('[videojs-hlsjs.js] STARTING PLUGIN');
+console.log('[videojs-hlsjs.js] Hls', Hls);
 
 (function (window, videojs, Hls) {
   'use strict';
 
-  console.log('Lancement fonction plugin');
+  console.log('[videojs-hlsjs.js] PLUGIN FUNCTION');
 
   var Tech = videojs.getTech('Tech');
+  console.log('[videojs-hlsjs.js] Tech', Tech);
   var Html5 = videojs.getTech('Html5');
+  console.log('[videojs-hlsjs.js] Html5', Html5);
 
   class Hlsjs extends Html5 {
 
     constructor(options) {
-      // console.log('Hlsjs.constructor() --> Début');
+      console.log('[videojs-hlsjs.js] [Hlsjs.constructor()] START');
       // if (!options.playerOptions) {
       //   options.playerOptions = {
       //     techOrder: [],
       //   };
       // }
-      console.log(options);
+      console.log('[videojs-hlsjs.js] [Hlsjs.constructor()] options', options);
       super(options);
-      console.log('Hlsjs.constructor() --> FIN');
       this.initHls_();
+      console.log('[videojs-hlsjs.js] [Hlsjs.constructor()] END');
     }
 
     /**
      * Init HLS.
      */
     initHls_()  {
-      console.log('Hlsjs.initHls_()');
-      console.log("this : ", this);
-      console.log("this.options : ", this.options_);
-      console.log("this.hls : ", this.hls_);
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] START');
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this', this);
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.options_', this.options_);
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.hls_', this.hls_);
       if (this.options_.hls === undefined) {
         this.options_ = {
           hls: {
@@ -116,6 +117,7 @@ console.log(Hls);
         this.options_.hls.autoStartLoad = false;
       }
       this.hls_ = new Hls(this.options_.hls);
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.hls_', this.hls_);
 
       this.bindExternalCallbacks_();
 
@@ -129,17 +131,24 @@ console.log(Hls);
       this.el_.addEventListener('error', Function.prototype.bind(this, this.onMediaError_));
 
       this.currentLevel_ = undefined;
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.currentLevel_');
       this.setLevelOnLoad_ = undefined;
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.setLevelOnLoad_');
       this.lastLevel_ = undefined;
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.lastLevel_');
       this.timeRange_ = undefined;
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.timeRange_');
       this.starttime_ = -1;
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.starttime_');
       this.levels_ = [];
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.levels_');
 
       this.hls_.attachMedia(this.el_);
+      console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] END');
     }
 
     bindExternalCallbacks_() {
-      console.log('Hlsjs.bindExternalCallbacks_()');
+      console.log('[videojs-hlsjs.js] [Hlsjs.bindExternalCallbacks_()] START');
       var resolveCallbackFromOptions = function(evt, options, hls) {
         var capitalize = function(str) {
           return str.charAt(0).toUpperCase() + str.slice(1);
@@ -164,15 +173,17 @@ console.log(Hls);
           }
         }
       }
+      console.log('[videojs-hlsjs.js] [Hlsjs.bindExternalCallbacks_()] END');
     }
 
     onMediaAttached_() {
-      console.log('Hlsjs.onMediaAttached_()');
+      console.log('[videojs-hlsjs.js] [Hlsjs.onMediaAttached_()] START');
       this.triggerReady();
+      console.log('[videojs-hlsjs.js] [Hlsjs.onMediaAttached_()] END');
     }
 
     updateTimeRange_() {
-      console.log('Hlsjs.updateTimeRange_()');
+      console.log('[videojs-hlsjs.js] [Hlsjs.updateTimeRange_()] START');
       var range;
 
       if (this.hls_ && this.hls_.currentLevel >= 0) {
@@ -203,10 +214,11 @@ console.log(Hls);
       }
 
       this.timeRange_ = range;
+      console.log('[videojs-hlsjs.js] [Hlsjs.updateTimeRange_()] END');
     }
 
     play() {
-      console.log('Hlsjs.play()');
+      console.log('[videojs-hlsjs.js] [Hlsjs.play()] START');
       if (this.preload() === 'none' && !this.hasStarted_) {
         if (this.setLevelOnLoad_) {
           this.setLevel(this.setLevelOnLoad_);
@@ -215,27 +227,30 @@ console.log(Hls);
       }
 
       Html5.prototype.play.apply(this);
+      console.log('[videojs-hlsjs.js] [Hlsjs.play()] END');
     }
 
     duration() {
-      console.log('Hlsjs.duration()');
+      console.log('[videojs-hlsjs.js] [Hlsjs.duration()] START');
       this.updateTimeRange_();
+      console.log('[videojs-hlsjs.js] [Hlsjs.duration()] RETURN,' (this.timeRange_) ? this.timeRange_.end - this.timeRange_.start : undefined);
       return (this.timeRange_) ? this.timeRange_.end - this.timeRange_.start : undefined;
     }
 
     currentTime() {
-      console.log('Hlsjs.currentTime()');
+      console.log('[videojs-hlsjs.js] [Hlsjs.currentTime()] START');
       this.updateTimeRange_();
       if (this.hls_.currentLevel !== this.lastLevel_) {
         this.trigger('levelswitched');
       }
 
       this.lastLevel_ = this.hls_.currentLevel;
+      console.log('[videojs-hlsjs.js] [Hlsjs.currentTime()] RETURN', Html5.prototype.currentTime.apply(this));
       return Html5.prototype.currentTime.apply(this);
     }
 
     seekable() {
-      console.log('Hlsjs.seekable()');
+      console.log('[videojs-hlsjs.js] [Hlsjs.seekable()] START');
       if (this.timeRange_) {
         return {
           start: function() { return this.timeRange_.start; }.bind(this),
@@ -243,12 +258,13 @@ console.log(Hls);
           length: 1
         };
       } else {
+        console.log('[videojs-hlsjs.js] [Hlsjs.seekable()] RETURN');
         return {length: 0};
       }
     }
 
     onManifestParsed_() {
-      console.log('Hlsjs.onManifestParsed_()');
+      console.log('[videojs-hlsjs.js] [Hlsjs.onManifestParsed_()] START');
       var hasAutoLevel = !this.options_.disableAutoLevel, startLevel, autoLevel;
 
       this.parseLevels_();
@@ -290,10 +306,11 @@ console.log(Hls);
       }
 
       this.trigger('levelsloaded');
+      console.log('[videojs-hlsjs.js] [Hlsjs.onManifestParsed_()] END');
     }
 
     initAudioTracks_() {
-      console.log('Hlsjs.initAudioTracks_()');
+      console.log('[videojs-hlsjs.js] [Hlsjs.initAudioTracks_()] START');
       var i, toRemove = [], vjsTracks = this.audioTracks(),
           hlsTracks = this.hls_.audioTracks,
           hlsGroups = [],
@@ -362,9 +379,11 @@ console.log(Hls);
         vjsTrack.addEventListener('enabledchange', modeChanged.bind(vjsTrack, this));
         vjsTracks.addTrack(vjsTrack);
       }
+      console.log('[videojs-hlsjs.js] [Hlsjs.initAudioTracks_()] END');
     }
 
     initTextTracks_() {
+      console.log('[videojs-hlsjs.js] [Hlsjs.initTextTracks_()] START');
       var i, toRemove = [], vjsTracks = this.textTracks(),
           hlsTracks = this.hls_.subtitleTracks,
           modeChanged = function() {
@@ -400,9 +419,11 @@ console.log(Hls);
       if (hlsHasDefaultTrack) {
         this.trigger('texttrackchange');
       }
+      console.log('[videojs-hlsjs.js] [Hlsjs.initTextTracks_()] END');
     }
 
     getLevelByHeight_(h) {
+      console.log('[videojs-hlsjs.js] [Hlsjs.getLevelByHeight_()] START');
       var i, result;
       for (i = 0; i < this.levels_.length; i++) {
         var cLevel = this.levels_[i],
@@ -414,6 +435,7 @@ console.log(Hls);
           result = this.levels_[i];
         }
       }
+      console.log('[videojs-hlsjs.js] [Hlsjs.getLevelByHeight_()] RETURN', result);
       return result;
     }
 
