@@ -121,14 +121,14 @@ console.log('[videojs-hlsjs.js] Hls', Hls);
 
       this.bindExternalCallbacks_();
 
-      this.hls_.on(Hls.Events.MEDIA_ATTACHED, videojs.bind(this, this.onMediaAttached_));
-      this.hls_.on(Hls.Events.MANIFEST_PARSED, videojs.bind(this, this.onManifestParsed_));
-      this.hls_.on(Hls.Events.MANIFEST_LOADED, videojs.bind(this, this.initAudioTracks_));
-      this.hls_.on(Hls.Events.MANIFEST_LOADED, videojs.bind(this, this.initTextTracks_));
-      this.hls_.on(Hls.Events.LEVEL_UPDATE, videojs.bind(this, this.updateTimeRange_));
-      this.hls_.on(Hls.Events.ERROR, videojs.bind(this, this.onError_));
+      this.hls_.on(Hls.Events.MEDIA_ATTACHED, Function.prototype.bind(this, this.onMediaAttached_));
+      this.hls_.on(Hls.Events.MANIFEST_PARSED, Function.prototype.bind(this, this.onManifestParsed_));
+      this.hls_.on(Hls.Events.MANIFEST_LOADED, Function.prototype.bind(this, this.initAudioTracks_));
+      this.hls_.on(Hls.Events.MANIFEST_LOADED, Function.prototype.bind(this, this.initTextTracks_));
+      this.hls_.on(Hls.Events.LEVEL_UPDATE, Function.prototype.bind(this, this.updateTimeRange_));
+      this.hls_.on(Hls.Events.ERROR, Function.prototype.bind(this, this.onError_));
 
-      this.el_.addEventListener('error', videojs.bind(this, this.onMediaError_));
+      this.el_.addEventListener('error', Function.prototype.bind(this, this.onMediaError_));
 
       this.currentLevel_ = undefined;
       console.log('[videojs-hlsjs.js] [Hlsjs.initHls_()] this.currentLevel_');
@@ -169,7 +169,7 @@ console.log('[videojs-hlsjs.js] Hls', Hls);
               callback = resolveCallbackFromOptions(evt, this.options_, this.hls_);
 
           if (callback) {
-            this.hls_.on(evt, videojs.bind(this, callback));
+            this.hls_.on(evt, Function.prototype.bind(this, callback));
           }
         }
       }
