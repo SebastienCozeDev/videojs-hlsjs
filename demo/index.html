@@ -10,8 +10,20 @@
   <link href="../node_modules/video.js/dist/video-js.min.css" rel="stylesheet">
   <script id="videojs_script_id" src="../node_modules/video.js/dist/video.min.js"></script>
 
+  <!-- <script>
+    var videojs = videojs;
+  </script> -->
+
   <script src="../node_modules/hls.js/dist/hls.js"></script>
   <script src="../dist/videojs-hlsjs.js"></script>
+
+  <script>
+    var downloadTotals = { http: 0, p2p: 0 };
+    var uploadTotal = 0;
+    var nb_peers = 0;
+  </script>
+
+  <script src="./js/video-p2p-stats.js"></script>
 
 </head>
 <body>
@@ -34,12 +46,87 @@
   </p>
   <source src="https://fcc3ddae59ed.us-west-2.playback.live-video.net/api/video/v1/us-west-2.893648527354.channel.DmumNckWFTqz.m3u8" type="application/x-mpegURL">
 </video>
+
+<div class="d-flex justify-content-end">
+  <span id="p2p-stat-peers" data-bs-toggle="tooltip" data-bs-title="">
+  <i class="bi bi-people-fill" aria-hidden="true"></i> 0
+  </span>&nbsp;|&nbsp;
+  <span id="p2p-stat-info">
+  <span id="p2p-stat-info-download" data-bs-toggle="tooltip" data-bs-title="">&nbsp;</span>
+  &nbsp;-&nbsp;
+  <span id="p2p-stat-info-upload" data-bs-toggle="tooltip" data-bs-title="">&nbsp;</span>
+  </span>
+</div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script>
+  const source = {
+    src: "https://fcc3ddae59ed.us-west-2.playback.live-video.net/api/video/v1/us-west-2.893648527354.channel.DmumNckWFTqz.m3u8",
+    type: "application/x-mpegURL",
+  };
+
+  const p2p_config = {
+    segments: {
+      swarmId: 'https://fcc3ddae59ed.us-west-2.playback.live-video.net/api/video/v1/us-west-2.893648527354.channel.DmumNckWFTqz.m3u8',
+    },
+    loader: {
+      trackerAnnounce: [
+        "wss://tracker.webtorrent.dev"
+      ],
+      rtcConfig: {
+        iceServers: [
+          "stun:stun.l.google.com:19302",
+          "stun:global.stun.twilio.com:3478"
+        ]
+      },
+    }
+  };
+
+	if (p2pml.hlsjs.Engine.isSupported()) {
+	  var engine = new p2pml.hlsjs.Engine(p2p_config);
+    console.log(engine);
+	  engine.on("peer_connect", peer => console.log("peer_connect", peer.id, peer.remoteAddress));
+	  engine.on("peer_close", peerId => console.log("peer_close", peerId));
+	  engine.on("segment_loaded", (segment, peerId) => console.log("segment_loaded from", peerId ? `peer ${peerId}` : "HTTP", segment.url));
+
+	  engine.on(p2pml.core.Events.PeerConnect, onPeerConnect.bind(this));
+	  engine.on(p2pml.core.Events.PeerClose, onPeerClose.bind(this));
+	  engine.on(p2pml.core.Events.PieceBytesDownloaded, onBytesDownloaded.bind(this));
+	  engine.on(p2pml.core.Events.PieceBytesUploaded, onBytesUploaded.bind(this));
+
+	  p2pml.hlsjs.initVideoJsHlsJsPlugin();
+
+    /*
+    var player = videojs('video', {
+      techOrder: ["html5"]
+    });
+    */
+
+	  var player = videojs("video", {
+      //techOrder: ['html5', 'hlsjs'],
+	    html5: {
+	      /*vhs: {
+	        overrideNative: false,
+	      },*/
+	      hlsjsConfig: {
+	        liveSyncDurationCount: 10, // To have at least 7 segments in queue
+	        loader: engine.createLoaderClass(),
+          debug: true,
+	      },
+	    },
+	  });
+
+    player.src(source);
+
+    // console.log(videojs.getTech('Hlsjs').canPlaySource(source));
+    // console.log(videojs.getTech('Tech'));
+
+	} else {
+	  document.write("Not supported :(");
+	}
+
   // fire up the plugin
-  var player = videojs('video', {
-    techOrder: ["html5"]
-  });
+
 
   $('#src').change(function() {
     player.src($('#src').val());
