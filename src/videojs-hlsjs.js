@@ -581,11 +581,11 @@ console.log(Hls);
     hls: {}
   };
 
-  console.log("C4EST LE PLAY", player.options());
+  console.log("[videojs-hlsjs.js] [player.options()]", player.options());
   Tech.registerTech('Hlsjs', Hlsjs);
   videojs.options.techOrder.push('hlsjs');
-  console.log("HLSjs EN COURS DE CREATION");
+  console.log("[videojs-hlsjs.js] HLSjs EN COURS DE CREATION");
   window.Hlsjs = new Hlsjs(player.options, player.ready);
-  console.log("HLSjs Créé");
+  console.log("[videojs-hlsjs.js] HLSjs Créé");
 
 })(window, videojs, Hls);
