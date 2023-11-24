@@ -1,7 +1,80 @@
 /*! videojs-hlsjs - v1.4.8 - 2023-11-24*/
+const source = {
+  src: "https://fcc3ddae59ed.us-west-2.playback.live-video.net/api/video/v1/us-west-2.893648527354.channel.DmumNckWFTqz.m3u8",
+  type: "application/x-mpegURL",
+};
+
+const p2p_config = {
+  segments: {
+    swarmId: 'https://fcc3ddae59ed.us-west-2.playback.live-video.net/api/video/v1/us-west-2.893648527354.channel.DmumNckWFTqz.m3u8',
+  },
+  loader: {
+    trackerAnnounce: [
+      "wss://tracker.webtorrent.dev"
+    ],
+    rtcConfig: {
+      iceServers: [
+        "stun:stun.l.google.com:19302",
+        "stun:global.stun.twilio.com:3478"
+      ]
+    },
+  }
+};
+
+if (p2pml.hlsjs.Engine.isSupported()) {
+  var engine = new p2pml.hlsjs.Engine(p2p_config);
+  console.log("Engine : ", engine);
+  engine.on("peer_connect", peer => console.log("peer_connect", peer.id, peer.remoteAddress));
+  engine.on("peer_close", peerId => console.log("peer_close", peerId));
+  engine.on("segment_loaded", (segment, peerId) => console.log("segment_loaded from", peerId ? `peer ${peerId}` : "HTTP", segment.url));
+
+  engine.on(p2pml.core.Events.PeerConnect, onPeerConnect.bind(this));
+  engine.on(p2pml.core.Events.PeerClose, onPeerClose.bind(this));
+  engine.on(p2pml.core.Events.PieceBytesDownloaded, onBytesDownloaded.bind(this));
+  engine.on(p2pml.core.Events.PieceBytesUploaded, onBytesUploaded.bind(this));
+
+  p2pml.hlsjs.initVideoJsHlsJsPlugin();
+
+  /*
+  var player = videojs('video', {
+    techOrder: ["html5"]
+  });
+  */
+
+  var player = videojs("video", {
+    //techOrder: ['html5', 'hlsjs'],
+    html5: {
+      /*vhs: {
+        overrideNative: false,
+      },*/
+      hlsjsConfig: {
+        liveSyncDurationCount: 10, // To have at least 7 segments in queue
+        loader: engine.createLoaderClass(),
+        debug: true,
+      },
+    },
+  });
+
+  player.src(source);
+
+  // console.log(videojs.getTech('Hlsjs').canPlaySource(source));
+  // console.log(videojs.getTech('Tech'));
+
+} else {
+  document.write("Not supported :(");
+}
+
+// fire up the plugin
+
+
+document.getElementById('src').addEventListener('change', function() { document.getElementById('player').src = this.value; });
+
+
+
+// ----- STARTING PLUGIN ----- //
+
 console.log("Lecture fichier plugin");
-console.log(videojs.options);
-console.log(window.videojs);
+console.log(Hls);
 
 (function (window, videojs, Hls) {
   'use strict';
@@ -17,7 +90,7 @@ console.log(window.videojs);
       console.log('Hlsjs.constructor() --> Début');
       super(options, ready);
       console.log('Hlsjs.constructor() --> FIN');
-
+      this.initHls_();
     }
 
     /**
@@ -25,6 +98,9 @@ console.log(window.videojs);
      */
     initHls_()  {
       console.log('Hlsjs.initHls_()');
+      console.log("this : ", this);
+      console.log("this.options : ", this.options_);
+      console.log("this.hls : ", this.hls_);
       this.options_.hls.autoStartLoad = false;
       this.hls_ = new Hls(this.options_.hls);
 
@@ -506,11 +582,11 @@ console.log(window.videojs);
     hls: {}
   };
 
+  console.log("C4EST LE PLAY", player.options());
   Tech.registerTech('Hlsjs', Hlsjs);
   videojs.options.techOrder.push('hlsjs');
   console.log("HLSjs EN COURS DE CREATION");
-  window.Hlsjs = new Hlsjs(videojs.options, () => true);
+  window.Hlsjs = new Hlsjs(player.options, player.ready);
   console.log("HLSjs Créé");
-  window.Hlsjs.initHls_();
-  console.log("HLSjs INITATLISIIS2");
+
 })(window, videojs, Hls);
