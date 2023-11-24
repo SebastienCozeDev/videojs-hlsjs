@@ -14,13 +14,14 @@ console.log(window.videojs);
   class Hlsjs extends Html5 {
 
     constructor(options) {
-      console.log('Hlsjs.constructor() --> Début');
-      if (!options.playerOptions) {
-        options.playerOptions = {};
-      }
+      // console.log('Hlsjs.constructor() --> Début');
+      // if (!options.playerOptions) {
+      //   options.playerOptions = {
+      //     techOrder: [],
+      //   };
+      // }
       super(options);
       console.log('Hlsjs.constructor() --> FIN');
-
     }
 
     /**
