@@ -1,4 +1,6 @@
 console.log("Lecture fichier plugin");
+console.log(videojs.options);
+console.log(window.videojs);
 
 (function (window, videojs, Hls) {
   'use strict';
@@ -10,9 +12,9 @@ console.log("Lecture fichier plugin");
 
   class Hlsjs extends Html5 {
 
-    constructor() {
+    constructor(options, ready) {
       console.log('Hlsjs.constructor() --> Début');
-      super(videojs.options, () => true);
+      super(options, ready);
       console.log('Hlsjs.constructor() --> FIN');
 
     }
@@ -506,7 +508,7 @@ console.log("Lecture fichier plugin");
   Tech.registerTech('Hlsjs', Hlsjs);
   videojs.options.techOrder.push('hlsjs');
   console.log("HLSjs EN COURS DE CREATION");
-  window.Hlsjs = new Hlsjs();
+  window.Hlsjs = new Hlsjs(videojs.options, () => true);
   console.log("HLSjs Créé");
   window.Hlsjs.initHls_();
   console.log("HLSjs INITATLISIIS2");
