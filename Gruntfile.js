@@ -45,6 +45,10 @@
         }
       },
       watch: {
+        files: [
+          './dist/videojs-hlsjs.js',
+        ],
+        tasks: ['build'],
         gruntfile: {
           files: '<%= jshint.gruntfile.src %>',
           tasks: ['jshint:gruntfile']
@@ -55,6 +59,8 @@
         }
       }
     });
+
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask('build', ['concat', /*'uglify'*/]);
     grunt.registerTask('serve', ['connect', 'watch']);

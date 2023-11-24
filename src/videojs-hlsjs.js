@@ -85,9 +85,15 @@ console.log(Hls);
 
   class Hlsjs extends Html5 {
 
-    constructor(options, ready) {
-      console.log('Hlsjs.constructor() --> Début');
-      super(options, ready);
+    constructor(options) {
+      // console.log('Hlsjs.constructor() --> Début');
+      // if (!options.playerOptions) {
+      //   options.playerOptions = {
+      //     techOrder: [],
+      //   };
+      // }
+      console.log(options);
+      super(options);
       console.log('Hlsjs.constructor() --> FIN');
       this.initHls_();
     }
@@ -595,5 +601,4 @@ console.log(Hls);
   console.log("[videojs-hlsjs.js] HLSjs EN COURS DE CREATION");
   window.Hlsjs = new Hlsjs(player.options, player.ready);
   console.log("[videojs-hlsjs.js] HLSjs Créé");
-
 })(window, videojs, Hls);

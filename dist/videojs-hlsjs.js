@@ -86,9 +86,14 @@ console.log(Hls);
 
   class Hlsjs extends Html5 {
 
-    constructor(options, ready) {
-      console.log('Hlsjs.constructor() --> Début');
-      super(options, ready);
+    constructor(options) {
+      // console.log('Hlsjs.constructor() --> Début');
+      // if (!options.playerOptions) {
+      //   options.playerOptions = {
+      //     techOrder: [],
+      //   };
+      // }
+      super(options);
       console.log('Hlsjs.constructor() --> FIN');
       this.initHls_();
     }
