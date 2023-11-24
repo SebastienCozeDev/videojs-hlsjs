@@ -101,7 +101,15 @@ console.log(Hls);
       console.log("this : ", this);
       console.log("this.options : ", this.options_);
       console.log("this.hls : ", this.hls_);
-      this.options_.hls.autoStartLoad = false;
+      if (this.options_.hls === undefined) {
+        this.options_ = {
+          hls: {
+            autoStartLoad: false,
+          },
+        };
+      } else {
+        this.options_.hls.autoStartLoad = false;
+      }
       this.hls_ = new Hls(this.options_.hls);
 
       this.bindExternalCallbacks_();
