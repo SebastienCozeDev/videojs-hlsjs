@@ -1,23 +1,27 @@
+console.log("Lecture fichier plugin");
+
 (function (window, videojs, Hls) {
   'use strict';
 
-  /**
-  * Initialize the plugin.
-  * @param options (optional) {object} configuration for the plugin
-  */
-  var Component = videojs.getComponent('Component'),
-      Tech = videojs.getTech('Tech'),
-      Html5 = videojs.getComponent('Html5');
+  console.log('Lancement fonction plugin');
 
+  var Tech = videojs.getTech('Tech');
+  var Html5 = videojs.getTech('Html5');
 
   class Hlsjs extends Html5 {
 
-    constructor(player, options) {
-      super(player, options);
-      this.initHls_();
+    constructor() {
+      console.log('Hlsjs.constructor() --> Début');
+      super(videojs.options, () => true);
+      console.log('Hlsjs.constructor() --> FIN');
+
     }
 
+    /**
+     * Init HLS.
+     */
     initHls_()  {
+      console.log('Hlsjs.initHls_()');
       this.options_.hls.autoStartLoad = false;
       this.hls_ = new Hls(this.options_.hls);
 
@@ -43,6 +47,7 @@
     }
 
     bindExternalCallbacks_() {
+      console.log('Hlsjs.bindExternalCallbacks_()');
       var resolveCallbackFromOptions = function(evt, options, hls) {
         var capitalize = function(str) {
           return str.charAt(0).toUpperCase() + str.slice(1);
@@ -70,10 +75,12 @@
     }
 
     onMediaAttached_() {
+      console.log('Hlsjs.onMediaAttached_()');
       this.triggerReady();
     }
 
     updateTimeRange_() {
+      console.log('Hlsjs.updateTimeRange_()');
       var range;
 
       if (this.hls_ && this.hls_.currentLevel >= 0) {
@@ -107,6 +114,7 @@
     }
 
     play() {
+      console.log('Hlsjs.play()');
       if (this.preload() === 'none' && !this.hasStarted_) {
         if (this.setLevelOnLoad_) {
           this.setLevel(this.setLevelOnLoad_);
@@ -118,11 +126,13 @@
     }
 
     duration() {
+      console.log('Hlsjs.duration()');
       this.updateTimeRange_();
       return (this.timeRange_) ? this.timeRange_.end - this.timeRange_.start : undefined;
     }
 
     currentTime() {
+      console.log('Hlsjs.currentTime()');
       this.updateTimeRange_();
       if (this.hls_.currentLevel !== this.lastLevel_) {
         this.trigger('levelswitched');
@@ -133,6 +143,7 @@
     }
 
     seekable() {
+      console.log('Hlsjs.seekable()');
       if (this.timeRange_) {
         return {
           start: function() { return this.timeRange_.start; }.bind(this),
@@ -145,6 +156,7 @@
     }
 
     onManifestParsed_() {
+      console.log('Hlsjs.onManifestParsed_()');
       var hasAutoLevel = !this.options_.disableAutoLevel, startLevel, autoLevel;
 
       this.parseLevels_();
@@ -189,6 +201,7 @@
     }
 
     initAudioTracks_() {
+      console.log('Hlsjs.initAudioTracks_()');
       var i, toRemove = [], vjsTracks = this.audioTracks(),
           hlsTracks = this.hls_.audioTracks,
           hlsGroups = [],
@@ -468,7 +481,7 @@
       }
       return Html5.prototype.dispose.apply(this);
     }
-  };
+  }
 
   Hlsjs.isSupported = function() {
     return Hls.isSupported();
@@ -490,8 +503,11 @@
     hls: {}
   };
 
-  Component.registerComponent('Hlsjs', Hlsjs);
-  Tech.registerTech('hlsjs', Hlsjs);
+  Tech.registerTech('Hlsjs', Hlsjs);
   videojs.options.techOrder.push('hlsjs');
-
-})(window, window.videojs, window.Hls);
+  console.log("HLSjs EN COURS DE CREATION");
+  window.Hlsjs = new Hlsjs();
+  console.log("HLSjs Créé");
+  window.Hlsjs.initHls_();
+  console.log("HLSjs INITATLISIIS2");
+})(window, videojs, Hls);
